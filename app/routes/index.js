@@ -1,5 +1,5 @@
-var eventRoutes = require("./events");
+const eventRoutes = require("./events");
 
-module.exports = function(app) {
+module.exports = (app) => {
 	eventRoutes(app);
 };

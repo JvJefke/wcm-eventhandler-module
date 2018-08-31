@@ -1,13 +1,11 @@
-"use strict";
-
-var mongoose = require("mongoose");
-var Schema = mongoose.Schema;
-var uuid = require("node-uuid");
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
+const uuid = require("node-uuid");
 
 delete mongoose.models.DigEvents;
 delete mongoose.modelSchemas.DigEvents;
 
-var DigEventsSchema = new Schema({
+const DigEventsSchema = new Schema({
 	uuid: {
 		type: String,
 		default: uuid,

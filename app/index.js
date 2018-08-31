@@ -1,8 +1,8 @@
-var hooksController = require("./controllers/hooks");
-var variablesHelper = require("./helpers/variables");
-var routes = require("./routes");
+const hooksController = require("./controllers/hooks");
+const variablesHelper = require("./helpers/variables");
+const routes = require("./routes");
 
-module.exports = function(app, hooks, moduleInfo) {
+module.exports = (app, hooks, moduleInfo) => {
 	// Set modules info received from the module system
 	variablesHelper.setPackageInfo(moduleInfo);
 	// Handle hooks

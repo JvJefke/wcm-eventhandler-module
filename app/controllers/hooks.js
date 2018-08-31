@@ -1,23 +1,19 @@
-var eventListener = require("./listener");
+const eventListener = require("./listener");
 
-var beforeRemove = function beforeRemove() {
+const beforeRemove = () => {
 	eventListener.removeListeners();
 };
 
-var beforeDisable = function beforeDisable() {
+const beforeDisable = () => {
 	eventListener.removeListeners();
 };
 
-var onEnabled = function onEnabled() {
+const onEnabled = () => {
 	eventListener.reinitialize();
 };
 
-module.exports = function handleHooks(hooks) {
-	var myHooks = {
-		beforeRemove: beforeRemove,
-		beforeDisable: beforeDisable,
-		onEnabled: onEnabled,
-	};
-
-	Object.assign(hooks, myHooks);
-};
+module.exports = (hooks) => Object.assign(hooks, {
+	beforeRemove: beforeRemove,
+	beforeDisable: beforeDisable,
+	onEnabled: onEnabled,
+});

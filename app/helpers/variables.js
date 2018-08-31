@@ -1,22 +1,25 @@
-var Q = require("q");
+const Q = require("q");
 
-var VariableHelper = require("@wcm/module-helper").variables;
-var packageConfig = require("../../package.json");
+const VariableHelper = require("@wcm/module-helper").variables;
+const packageConfig = require("../../package.json");
 
-var packageInfo = null;
+let packageInfo = null;
 
-module.exports.get = function getVariables() {
+const setPackageInfo = module.exports.setPackageInfo = (info) => {
+	packageInfo = info || packageInfo;
+};
+
+module.exports.getPackageInfo = () => {
+	return packageInfo;
+};
+
+module.exports.get = (info) => {
+	setPackageInfo(info);
+
 	if (packageInfo === null) {
-		return Q.reject("No info set");
+		return Q.reject("No packageInfo available", packageConfig.name);
 	}
-	return VariableHelper.getAll(packageConfig.name, packageConfig.version);
-};
 
-module.exports.setPackageInfo = function setPackageInfo(info) {
-	packageConfig = info;
-};
-
-module.exports.getPackageInfo = function getPackageInfo() {
-	return packageConfig;
+	return VariableHelper.getAll(packageInfo.name, packageInfo.version);
 };
 

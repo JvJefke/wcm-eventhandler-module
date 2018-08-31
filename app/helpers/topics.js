@@ -1,54 +1,44 @@
-var _ = require("lodash");
-var Q = require("q");
+const _ = require("lodash");
+const Q = require("q");
 
-var config = require("config")();
-var EventsModel = require("../models/events");
-var eventRequestHelper = require("./eventRequest");
-var listenerController = require("../controllers/listener");
+const config = require("config")();
+const EventsModel = require("../models/events");
+const eventRequestHelper = require("./eventRequest");
+const listenerController = require("../controllers/listener");
 
-var create = module.exports.create = function create(event) {
-	var events = _.get(event, "data.events", []);
-	var promises = _.map(events, function(e) {
+const create = module.exports.create = (event) => {
+	const events = _.get(event, "data.events", []);
+	const promises = _.map(events, function(e) {
 		return eventRequestHelper("PUT", "topics/" + config.name + "_" + e.topic);
 	});
 
 	return Q.all(promises)
-		.then(function() {
+		.then(() => {
 			listenerController.reloadConfig();
 			return event;
 		});
 };
 
-var remove = module.exports.remove = function remove(event) {
-	var events = _.get(event, "data.events", []);
-	var promises = _.map(events, function(e) {
-		return EventsModel.findOne({ "data.events.topic": e.topic })
-			.lean()
-			.then(function(eventStillExists) {
-				if (eventStillExists) {
-					return;
-				}
-
-				return eventRequestHelper("DELETE", "topics/" + config.name + "_" + e.topic);
-			});
-	});
+const remove = module.exports.remove = (event) => {
+	const events = _.get(event, "data.events", []);
+	const promises = _.map(events, (e) => EventsModel.findOne({ "data.events.topic": e.topic })
+		.lean()
+		.then((eventStillExists) => eventStillExists ? null : eventRequestHelper("DELETE", "topics/" + config.name + "_" + e.topic))
+	);
 
 	return Q.all(promises)
-		.then(function() {
-			listenerController.reloadConfig();
-			return event;
-		});
+        .then(() => {
+	listenerController.reloadConfig();
+	return event;
+});
 };
 
-module.exports.update = function update(oldTopic, newTopic) {
-	return remove(oldTopic)
-		.then(function() {
-			return create(newTopic);
-		}, function() {
-			return create(newTopic);
-		})
-		.then(function() {
-			listenerController.reloadConfig();
-			return newTopic;
-		});
-};
+module.exports.update = (oldTopic, newTopic) => remove(oldTopic)
+    .then(
+        () => create(newTopic),
+        () => create(newTopic)
+    )
+    .then(() => {
+	listenerController.reloadConfig();
+	return newTopic;
+});
